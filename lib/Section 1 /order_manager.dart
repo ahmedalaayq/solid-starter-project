@@ -1,5 +1,4 @@
-
-
+library;
 /// Data Validations
 /// Calculate Total Price
 /// Inventory Management
@@ -10,26 +9,26 @@
 /// Warehouse Communication
 
 class OrderManager {
+  // OrderModel Data
   String customerName = '';
   String customerEmail = '';
   List<Map<String, dynamic>> items = [];
   double totalAmount = 0.0;
 
   bool createOrder(Map<String, dynamic> orderData) {
-
+    // Order Validation
     if (orderData['customerName'] == null ||
         orderData['customerName'].isEmpty) {
       print('Error: Customer name is required');
       return false;
     }
 
-
     if (!orderData['customerEmail'].contains('@')) {
       print('Error: Invalid email format');
       return false;
     }
 
-
+    // calculate Order Total Price
     double total = 0.0;
     for (var item in orderData['items']) {
       total += item['price'] * item['quantity'];
@@ -37,15 +36,16 @@ class OrderManager {
       if (item['quantity'] > 10) {
         total *= 0.9;
       }
-
+      // validation order stock
       if (item['stock'] < item['quantity']) {
         print('Error: Insufficient stock for ${item['name']}');
         return false;
       }
-
+      // open connection on database
       updateInventoryInDatabase(item['id'], item['stock'] - item['quantity']);
     }
 
+    // payment method using creditCard
     if (orderData['paymentMethod'] == 'credit_card') {
       bool paymentSuccess = chargeCreditCard(
         orderData['cardNumber'],
@@ -57,7 +57,9 @@ class OrderManager {
         print('Payment failed');
         return false;
       }
-    } else if (orderData['paymentMethod'] == 'paypal') {
+    }
+    // payment method using paypal
+    else if (orderData['paymentMethod'] == 'paypal') {
       bool paymentSuccess = chargePaypal(orderData['paypalEmail'], total);
       if (!paymentSuccess) {
         print('PayPal payment failed');
@@ -65,9 +67,10 @@ class OrderManager {
       }
     }
 
+    // save Order Database --> Order Repo
     saveOrderToDatabase(orderData);
 
-
+    // Email Notification
     sendEmail(
       orderData['customerEmail'],
       'Order Confirmation',
@@ -77,6 +80,7 @@ class OrderManager {
     /// Analytics Tracking
     updateAnalytics('order_completed', total);
 
+    // WareHouse Notify
     notifyWarehouse(orderData);
 
     return true;
@@ -102,7 +106,6 @@ class OrderManager {
 
   void saveOrderToDatabase(Map<String, dynamic> orderData) {
     /// Impl
-
   }
 
   void sendEmail(String to, String subject, String body) {

@@ -1,4 +1,14 @@
-class UserManager {
+library;
+
+// UserModel 
+// EmailValidation 
+// HashPassword 
+// UserRepo --> CRUD --> CRUD Operations --> create , read , update, delete 
+// EmailService 
+// UserLogger --> UserTracker , UserAudit 
+
+// Manager --> Violate Single Responsibilty
+class UserManagerBad {
   String name = '';
   String email = '';
 
@@ -33,9 +43,10 @@ class UserManager {
     sendWelcomeEmail();
     logUserCreation();
   }
+
 }
 
 void main() {
-  final manager = UserManager();
+  final manager = UserManagerBad();
   manager.createUser('John', 'john@example.com', 'password123');
 }
